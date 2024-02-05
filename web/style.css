@@ -1,0 +1,28 @@
+html {
+    height: 100%
+}
+
+body {
+    height: 100%;
+    background-color: linen;
+}
+
+.wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.businesscard {
+    height: auto;
+    margin: 20px;
+    width: 100%;
+    max-width: 788px;
+    max-height: 450px;
+}
+
+.phone {
+    top: 47.5%;
+}
