@@ -20,6 +20,7 @@ locals {
   default_certs = []
   acm_certs     = ["acm"]
   domain_name   = [var.domain_name]
+  rediredct_domain_name   = ["www.${var.domain_name}"]
 }
 
 data "aws_acm_certificate" "acm_cert" {
@@ -121,13 +122,27 @@ resource "aws_s3_object" "css" {
   etag         = filemd5("${path.module}/../web/style.css")
 }
 
+// bucket for static redirect of www subdomain to root domain
+resource "aws_s3_bucket" "s3_redirect_bucket" {
+  bucket = "www.${var.domain_name}"
+}
+
+resource "aws_s3_bucket_website_configuration" "bucket_redirect" {
+  bucket = aws_s3_bucket.s3_redirect_bucket.id
+  
+  redirect_all_requests_to {
+    host_name = aws_s3_bucket.s3_bucket.bucket
+    protocol  = "https"
+  }
+}
+
+### ROUTE53 ###
+
 data "aws_route53_zone" "domain_name" {
   name         = var.hosted_zone
   private_zone = false
 }
 
-
-### ROUTE53 ###
 
 resource "aws_route53_record" "route53_record" {
   depends_on = [
@@ -143,6 +158,23 @@ resource "aws_route53_record" "route53_record" {
     zone_id = "Z2FDTNDATAQYW2"
 
     //HardCoded value for CloudFront
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "route53_redirect_record" {
+  depends_on = [
+    aws_cloudfront_distribution.s3_redirect_distribution
+  ]
+
+  zone_id = data.aws_route53_zone.domain_name.zone_id
+  name    = "www.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name    = aws_cloudfront_distribution.s3_redirect_distribution.domain_name
+    //HardCoded value for CloudFront
+    zone_id = "Z2FDTNDATAQYW2"
     evaluate_target_health = false
   }
 }
@@ -227,6 +259,87 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     response_page_path    = "/index.html"
   }
 
+  wait_for_deployment = false
+}
+
+resource "aws_cloudfront_distribution" "s3_redirect_distribution" {
+  depends_on = [
+    aws_s3_bucket.s3_redirect_bucket
+  ]
+
+  origin {
+    domain_name = aws_s3_bucket_website_configuration.bucket_redirect.website_endpoint
+    origin_id   = "s3-cloudfront"
+
+    custom_origin_config {
+      http_port                = 80
+      https_port               = 443
+      origin_keepalive_timeout = 5
+      origin_protocol_policy   = "http-only"
+      origin_read_timeout      = 30
+      origin_ssl_protocols = [
+        "TLSv1.2",
+      ]
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+
+  aliases = local.rediredct_domain_name
+
+  default_cache_behavior {
+    allowed_methods = [
+      "GET",
+      "HEAD",
+    ]
+
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
+
+    target_origin_id = "s3-cloudfront"
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+
+    # https://stackoverflow.com/questions/67845341/cloudfront-s3-etag-possible-for-cloudfront-to-send-updated-s3-object-before-t
+    min_ttl     = var.cloudfront_min_ttl
+    default_ttl = var.cloudfront_default_ttl
+    max_ttl     = var.cloudfront_max_ttl
+  }
+
+  price_class = var.price_class
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+      locations = []
+    }
+  }
+  dynamic "viewer_certificate" {
+    for_each = local.default_certs
+    content {
+      cloudfront_default_certificate = true
+    }
+  }
+
+  dynamic "viewer_certificate" {
+    for_each = local.acm_certs
+    content {
+      acm_certificate_arn      = data.aws_acm_certificate.acm_cert.arn
+      ssl_support_method       = "sni-only"
+      minimum_protocol_version = "TLSv1"
+    }
+  }
   wait_for_deployment = false
 }
 
