@@ -108,7 +108,7 @@ resource "aws_s3_object" "css" {
 
 resource "aws_s3_object" "icon" {
   bucket       = aws_s3_bucket.s3_bucket.bucket
-  key          = "favicon.ico"
+  key          = "resources/favicon.ico"
   source       = "${path.module}/../web/resources/favicon.ico"
   content_type = "image/x-icon"
   etag         = filemd5("${path.module}/../web/resources/favicon.ico")
@@ -116,7 +116,7 @@ resource "aws_s3_object" "icon" {
 
 resource "aws_s3_object" "portrait" {
   bucket       = aws_s3_bucket.s3_bucket.bucket
-  key          = "portrait.jpeg"
+  key          = "resources/portrait.jpeg"
   source       = "${path.module}/../web/resources/portrait.jpeg"
   content_type = "image/jpeg"
   etag         = filemd5("${path.module}/../web/resources/portrait.jpeg")
@@ -124,7 +124,7 @@ resource "aws_s3_object" "portrait" {
 
 resource "aws_s3_object" "envelope" {
   bucket       = aws_s3_bucket.s3_bucket.bucket
-  key          = "envelope.svg"
+  key          = "resources/envelope.svg"
   source       = "${path.module}/../web/resources/envelope.svg"
   content_type = "image/svg+xml"
   etag         = filemd5("${path.module}/../web/resources/envelope.svg")
@@ -132,7 +132,7 @@ resource "aws_s3_object" "envelope" {
 
 resource "aws_s3_object" "linkedin" {
   bucket       = aws_s3_bucket.s3_bucket.bucket
-  key          = "linkedin.svg"
+  key          = "resources/linkedin.svg"
   source       = "${path.module}/../web/resources/linkedin.svg"
   content_type = "image/svg+xml"
   etag         = filemd5("${path.module}/../web/resources/linkedin.svg")
@@ -140,7 +140,7 @@ resource "aws_s3_object" "linkedin" {
 
 resource "aws_s3_object" "phone" {
   bucket       = aws_s3_bucket.s3_bucket.bucket
-  key          = "phone.svg"
+  key          = "resources/phone.svg"
   source       = "${path.module}/../web/resources/phone.svg"
   content_type = "image/svg+xml"
   etag         = filemd5("${path.module}/../web/resources/phone.svg")

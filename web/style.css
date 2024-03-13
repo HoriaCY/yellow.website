@@ -48,6 +48,13 @@
     row-gap: 22px;
     font-size: 20px;
   }
+
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    row-gap: 22px;
+    align-self: center;
+  }
   
   .name {
     font-size: 32px;
