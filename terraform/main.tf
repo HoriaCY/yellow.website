@@ -98,22 +98,6 @@ resource "aws_s3_object" "error" {
   etag         = filemd5("${path.module}/../web/error.html")
 }
 
-resource "aws_s3_object" "img" {
-  bucket       = aws_s3_bucket.s3_bucket.bucket
-  key          = "businesscard.png"
-  source       = "${path.module}/../web/businesscard.png"
-  content_type = "image/png"
-  etag         = filemd5("${path.module}/../web/businesscard.png")
-}
-
-resource "aws_s3_object" "icon" {
-  bucket       = aws_s3_bucket.s3_bucket.bucket
-  key          = "favicon.ico"
-  source       = "${path.module}/../web/favicon.ico"
-  content_type = "image/x-icon"
-  etag         = filemd5("${path.module}/../web/favicon.ico")
-}
-
 resource "aws_s3_object" "css" {
   bucket       = aws_s3_bucket.s3_bucket.bucket
   key          = "style.css"
@@ -121,6 +105,47 @@ resource "aws_s3_object" "css" {
   content_type = "text/css"
   etag         = filemd5("${path.module}/../web/style.css")
 }
+
+resource "aws_s3_object" "icon" {
+  bucket       = aws_s3_bucket.s3_bucket.bucket
+  key          = "favicon.ico"
+  source       = "${path.module}/../web/resources/favicon.ico"
+  content_type = "image/x-icon"
+  etag         = filemd5("${path.module}/../web/resources/favicon.ico")
+}
+
+resource "aws_s3_object" "portrait" {
+  bucket       = aws_s3_bucket.s3_bucket.bucket
+  key          = "portrait.jpeg"
+  source       = "${path.module}/../web/resources/portrait.jpeg"
+  content_type = "image/jpeg"
+  etag         = filemd5("${path.module}/../web/resources/portrait.jpeg")
+}
+
+resource "aws_s3_object" "envelope" {
+  bucket       = aws_s3_bucket.s3_bucket.bucket
+  key          = "envelope.svg"
+  source       = "${path.module}/../web/resources/envelope.svg"
+  content_type = "image/svg+xml"
+  etag         = filemd5("${path.module}/../web/resources/envelope.svg")
+}
+
+resource "aws_s3_object" "linkedin" {
+  bucket       = aws_s3_bucket.s3_bucket.bucket
+  key          = "linkedin.svg"
+  source       = "${path.module}/../web/resources/linkedin.svg"
+  content_type = "image/svg+xml"
+  etag         = filemd5("${path.module}/../web/resources/linkedin.svg")
+}
+
+resource "aws_s3_object" "phone" {
+  bucket       = aws_s3_bucket.s3_bucket.bucket
+  key          = "phone.svg"
+  source       = "${path.module}/../web/resources/phone.svg"
+  content_type = "image/svg+xml"
+  etag         = filemd5("${path.module}/../web/resources/phone.svg")
+}
+
 
 // bucket for static redirect of www subdomain to root domain
 resource "aws_s3_bucket" "s3_redirect_bucket" {
